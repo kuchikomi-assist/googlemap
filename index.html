@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>口コミ投稿のご協力のお願い</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <div class="max-w-md mx-auto px-4 py-6 pb-16">
+
+    <!-- ヘッダー -->
+    <header class="text-center mb-6">
+      <h1 class="text-xl font-bold text-gray-800">口コミ投稿のご協力をお願いします</h1>
+      <p class="text-sm text-gray-500 mt-2 leading-relaxed">
+        当てはまるものをタップして選ぶだけで、口コミ文章のたたき台を自動作成できます。<br>
+        内容は自由に編集してからご投稿ください。
+      </p>
+    </header>
+
+    <!-- Step1: 来店理由・お悩み -->
+    <section class="bg-white rounded-2xl shadow-sm p-4 mb-4">
+      <h2 class="text-sm font-bold text-gray-700 mb-3">① 来店理由・お悩み</h2>
+      <div id="group-reason" class="flex flex-wrap gap-2"></div>
+    </section>
+
+    <!-- Step2: 施術や対応の感想 -->
+    <section class="bg-white rounded-2xl shadow-sm p-4 mb-4">
+      <h2 class="text-sm font-bold text-gray-700 mb-3">② 施術・対応の感想</h2>
+      <div id="group-impression" class="flex flex-wrap gap-2"></div>
+    </section>
+
+    <!-- Step3: おすすめしたい人 -->
+    <section class="bg-white rounded-2xl shadow-sm p-4 mb-4">
+      <h2 class="text-sm font-bold text-gray-700 mb-3">③ こんな方におすすめしたい</h2>
+      <div id="group-recommend" class="flex flex-wrap gap-2"></div>
+    </section>
+
+    <!-- Step4: 自由記述 -->
+    <section class="bg-white rounded-2xl shadow-sm p-4 mb-4">
+      <h2 class="text-sm font-bold text-gray-700 mb-3">④ その他、自由にひとこと（任意）</h2>
+      <textarea id="freeText" rows="3"
+        class="w-full text-sm border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        placeholder="例）駐車場が広くて助かりました、など自由にご記入ください"></textarea>
+    </section>
+
+    <!-- 生成ボタン -->
+    <button id="generateBtn"
+      class="w-full bg-blue-500 hover:bg-blue-600 active:scale-[0.98] transition text-white font-bold py-3 rounded-xl shadow-sm mb-4">
+      口コミ文章を作成する
+    </button>
+
+    <!-- 結果表示 -->
+    <section id="resultSection" class="bg-white rounded-2xl shadow-sm p-4 mb-4 hidden">
+      <h2 class="text-sm font-bold text-gray-700 mb-3">作成された口コミ文章（自由に編集できます）</h2>
+      <textarea id="resultText" rows="8"
+        class="w-full text-sm border border-gray-300 rounded-xl p-3 leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+
+      <div class="mt-3 space-y-2">
+        <button id="copyBtn"
+          class="w-full bg-gray-700 hover:bg-gray-800 active:scale-[0.98] transition text-white font-bold py-3 rounded-xl shadow-sm">
+          文章をコピー
+        </button>
+        <p id="copyMsg" class="text-center text-sm text-green-600 font-bold hidden">コピーしました！</p>
+
+        <a id="googleMapBtn" href="#" target="_blank" rel="noopener noreferrer"
+          class="block text-center w-full bg-green-500 hover:bg-green-600 active:scale-[0.98] transition text-white font-bold py-3 rounded-xl shadow-sm">
+          Google Mapで口コミを書く
+        </a>
+      </div>
+    </section>
+
+  </div>
+
+<script>
+  // ------------------------------------------------------------------
+  // ★ここを各院のGoogleマップ口コミ投稿用URLに書き換えてください
+  //   （Googleビジネスプロフィール管理画面の「クチコミ」→「クチコミを増やす」で取得できるリンク）
+  // ------------------------------------------------------------------
+  const GOOGLE_MAP_REVIEW_URL = "https://maps.app.goo.gl/3CB4k8Wt9dmpGKqm7";
+
+  // チップの選択肢定義
+  const CHIP_DATA = {
+    reason: [
+      "長年の腰痛", "肩こり・頭痛", "姿勢矯正", "産後骨盤矯正",
+      "膝・関節の痛み", "スポーツ後のケア"
+    ],
+    impression: [
+      "説明が分かりやすい", "痛みが軽くなった", "スタッフが親切",
+      "院内が清潔", "予約が取りやすい", "先生が親身に相談に乗ってくれる"
+    ],
+    recommend: [
+      "どこに行っても治らなかった人", "デスクワークの人", "子連れのママ",
+      "スポーツをしている人", "姿勢が気になる人", "体の不調が続いている人"
+    ]
+  };
+
+  const selected = { reason: new Set(), impression: new Set(), recommend: new Set() };
+
+  // チップ生成
+  function renderChips(groupKey) {
+    const container = document.getElementById(`group-${groupKey}`);
+    CHIP_DATA[groupKey].forEach(label => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.textContent = label;
+      chip.dataset.value = label;
+      chip.className = chipClass(false);
+      chip.addEventListener("click", () => {
+        const set = selected[groupKey];
+        if (set.has(label)) {
+          set.delete(label);
+          chip.className = chipClass(false);
+        } else {
+          set.add(label);
+          chip.className = chipClass(true);
+        }
+      });
+      container.appendChild(chip);
+    });
+  }
+
+  function chipClass(active) {
+    const base = "px-3 py-2 rounded-full text-sm border transition active:scale-95";
+    return active
+      ? `${base} bg-blue-500 text-white border-blue-500`
+      : `${base} bg-gray-50 text-gray-700 border-gray-300`;
+  }
+
+  ["reason", "impression", "recommend"].forEach(renderChips);
+
+  // 配列を自然な日本語の列挙表現に変換
+  function joinList(arr) {
+    if (arr.length === 0) return "";
+    if (arr.length === 1) return arr[0];
+    return arr.slice(0, -1).join("や") + "や" + arr[arr.length - 1] + "など";
+  }
+
+  function buildReviewText() {
+    const reasons = Array.from(selected.reason);
+    const impressions = Array.from(selected.impression);
+    const recommends = Array.from(selected.recommend);
+    const freeText = document.getElementById("freeText").value.trim();
+
+    const lines = [];
+
+    if (reasons.length > 0) {
+      lines.push(`${joinList(reasons)}で悩んでいて、こちらの院にお世話になりました。`);
+    } else {
+      lines.push("以前から体の不調に悩んでいて、こちらの院にお世話になりました。");
+    }
+
+    if (impressions.length > 0) {
+      lines.push(`${joinList(impressions)}、対応にとても満足しています。`);
+    }
+
+    if (recommends.length > 0) {
+      lines.push(`${joinList(recommends)}には、特におすすめしたいと思います。`);
+    }
+
+    if (freeText) {
+      lines.push(freeText);
+    }
+
+    lines.push("これからもお世話になりたいと思います。");
+
+    return lines.join("\n");
+  }
+
+  document.getElementById("generateBtn").addEventListener("click", () => {
+    const text = buildReviewText();
+    document.getElementById("resultText").value = text;
+    document.getElementById("resultSection").classList.remove("hidden");
+    document.getElementById("copyMsg").classList.add("hidden");
+    document.getElementById("googleMapBtn").href = GOOGLE_MAP_REVIEW_URL;
+    document.getElementById("resultSection").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  document.getElementById("copyBtn").addEventListener("click", async () => {
+    const text = document.getElementById("resultText").value;
+    const msg = document.getElementById("copyMsg");
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      // clipboard APIが使えない環境向けのフォールバック
+      const ta = document.getElementById("resultText");
+      ta.select();
+      document.execCommand("copy");
+    }
+    msg.classList.remove("hidden");
+    setTimeout(() => msg.classList.add("hidden"), 2000);
+  });
+</script>
+</body>
+</html>
