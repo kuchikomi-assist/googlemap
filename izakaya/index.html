@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>口コミ投稿のご協力のお願い</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root { --brand: #2563eb; --brand-dark: #1d4ed8; }
+  .brand-bg { background-color: var(--brand); }
+  .brand-bg:hover { background-color: var(--brand-dark); }
+  .brand-text { color: var(--brand); }
+  .brand-border { border-color: var(--brand); }
+  .chip-active { background-color: var(--brand); border-color: var(--brand); color: #fff; }
+  .step-fade { animation: stepFade .25s ease; }
+  @keyframes stepFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .dot { transition: all .2s ease; }
+  .copy-pop { animation: copyPop .3s ease; }
+  @keyframes copyPop { 0% { transform: scale(.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div class="max-w-md mx-auto px-4 py-6 pb-16">
+
+    <!-- ヘッダー -->
+    <header class="text-center mb-5">
+      <h1 class="text-lg font-bold text-gray-800" id="headerTitle">口コミ投稿のご協力をお願いします</h1>
+      <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">
+        タップして選ぶだけで、口コミ文章のたたき台を自動作成できます
+      </p>
+    </header>
+
+    <!-- 進捗バー -->
+    <div id="progressWrap" class="flex items-center justify-center gap-1.5 mb-5">
+      <!-- JSでドット生成 -->
+    </div>
+
+    <!-- ウィザード本体 -->
+    <div id="wizard" class="bg-white rounded-2xl shadow-sm p-5 mb-4 min-h-[260px] flex flex-col">
+      <div id="stepContent" class="flex-1"></div>
+
+      <div class="flex gap-2 mt-5">
+        <button id="backBtn"
+          class="hidden flex-1 border border-gray-300 text-gray-600 font-bold py-3 rounded-xl active:scale-[0.98] transition">
+          戻る
+        </button>
+        <button id="nextBtn"
+          class="flex-1 brand-bg text-white font-bold py-3 rounded-xl shadow-sm active:scale-[0.98] transition disabled:opacity-40 disabled:pointer-events-none">
+          次へ
+        </button>
+      </div>
+      <p id="validationMsg" class="text-xs text-red-500 text-center mt-2 hidden">1つ以上タップして選んでください</p>
+    </div>
+
+    <!-- 結果表示 -->
+    <section id="resultSection" class="bg-white rounded-2xl shadow-sm p-4 mb-4 hidden step-fade">
+      <h2 class="text-sm font-bold text-gray-700 mb-3">作成された口コミ文章（自由に編集できます）</h2>
+      <textarea id="resultText" rows="8"
+        class="w-full text-sm border border-gray-300 rounded-xl p-3 leading-relaxed focus:outline-none focus:ring-2"
+        style="--tw-ring-color: var(--brand);"></textarea>
+
+      <div class="mt-3 space-y-2">
+        <button id="copyBtn"
+          class="w-full bg-gray-800 hover:bg-gray-900 active:scale-[0.98] transition text-white font-bold py-3 rounded-xl shadow-sm">
+          文章をコピー
+        </button>
+        <p id="copyMsg" class="text-center text-sm text-green-600 font-bold hidden copy-pop">✓ コピーしました！</p>
+
+        <a id="googleMapBtn" href="#" target="_blank" rel="noopener noreferrer"
+          class="block text-center w-full bg-green-500 hover:bg-green-600 active:scale-[0.98] transition text-white font-bold py-3 rounded-xl shadow-sm">
+          Google Mapで口コミを書く
+        </a>
+
+        <button id="resetBtn"
+          class="w-full text-gray-400 text-xs py-2 underline underline-offset-2">
+          はじめからやり直す
+        </button>
+      </div>
+    </section>
+
+    <footer id="poweredByFooter" class="text-center mt-6 hidden">
+      <a href="#" id="poweredByLink" target="_blank" rel="noopener noreferrer" class="text-[11px] text-gray-300 hover:text-gray-400">
+        Powered by クチコミアシスト
+      </a>
+    </footer>
+
+  </div>
+
+<script>
+  // ==================================================================
+  // ★★★ このアプリ（居酒屋・飲食店版）を使う全店舗で共通の選択肢 ★★★
+  // 「利用シーン」「感想」「おすすめしたい人」はほとんどの居酒屋で
+  // そのまま使い回せるので、共通の名簿として1か所にまとめている。
+  // 店ごとに変えたい場合だけ、下のSTORESの中にchipDataとして書けば上書きできる。
+  // ==================================================================
+  const DEFAULT_CHIP_DATA = {
+    reason: [
+      "友人との飲み会", "仕事帰りの一杯", "デート", "接待・会食",
+      "家族での食事", "誕生日・記念日"
+    ],
+    impression: [
+      "料理が美味しかった", "コスパが良かった", "お酒の種類が豊富だった",
+      "店員さんが親切だった", "店内の雰囲気が良かった", "個室でゆっくりできた"
+    ],
+    recommend: [
+      "美味しいお酒を飲みたい人", "友人とワイワイしたい人", "落ち着いて話したいカップル",
+      "接待で使いたい人", "コスパ重視の人", "地元の名店を探している人"
+    ]
+  };
+
+  // ==================================================================
+  // ★★★ 店舗の名簿（新しいお店を増やすときは、ここに1つ追加するだけ） ★★★
+  // URLの末尾に ?store=店のID を付けて開くと、その店の設定が使われる。
+  // 例）.../index.html?store=kanedaya
+  // ==================================================================
+  const STORES = {
+    demo: {
+      config: {
+        // ブランドカラー（お店のロゴ・看板の色に合わせる）
+        brandColor: "#2563eb",
+        brandColorDark: "#1d4ed8",
+
+        // ヘッダーに表示するタイトル
+        headerTitle: "口コミ投稿のご協力をお願いします",
+
+        // Googleマップの口コミ投稿用URL
+        // （Googleビジネスプロフィール管理画面の「クチコミ」→「クチコミを増やす」で取得）
+        googleMapReviewUrl: "https://g.page/r/XXXXXXXXXXXXXXXXXXX/review",
+
+        // MEO（マップ検索対策）用：店名・エリア名（最寄り駅や地名）
+        storeName: "〇〇（店名）",
+        areaKeyword: "〇〇駅（エリア名）",
+
+        // 無料プランはフッターに運営元クレジットを表示（有料プランでは非表示にする）
+        showPoweredBy: true,
+        poweredByUrl: "#"
+      },
+      // メニューだけは店ごとに必ず違うので、必ずここに書く
+      chipData: {
+        menu: ["焼き鳥", "刺身盛り合わせ", "唐揚げ", "日本酒", "ハイボール", "〆のラーメン"]
+      }
+    },
+    // ★金田屋（デモ）：実際に導入する場合は、本当のメニューとGoogleマップURLに差し替える
+    kanedaya: {
+      config: {
+        brandColor: "#c2410c",
+        brandColorDark: "#9a3412",
+        headerTitle: "口コミ投稿のご協力をお願いします",
+        // ← 通常のGoogleマップのお店ページ。本番では、オーナー用管理画面の「クチコミを増やす」で発行される専用リンクに差し替える
+        googleMapReviewUrl: "https://www.google.com/maps/place/%E3%80%92591-8022+%E5%A4%A7%E9%98%AA%E5%BA%9C%E5%A0%BA%E5%B8%82%E5%8C%97%E5%8C%BA%E9%87%91%E5%B2%A1%E7%94%BA%EF%BC%92%EF%BC%92%EF%BC%95%EF%BC%91%E2%88%92%EF%BC%98+%E9%87%91%E7%94%B0%E5%B1%8B/@34.5578872,135.5192092,16z/data=!4m6!3m5!1s0x6000db48453e9009:0x5f9ae8cf8f2e4063!8m2!3d34.5578872!4d135.5192092!16s%2Fg%2F11tb_wq7h8",
+        storeName: "金田屋",
+        areaKeyword: "金岡",
+        showPoweredBy: true,
+        poweredByUrl: "#"
+      },
+      // 仮の一般的な居酒屋メニュー。実際のメニューが分かり次第、差し替える
+      chipData: {
+        menu: ["もつ煮込み", "焼き鳥", "刺身盛り合わせ", "だし巻き玉子", "日本酒", "レモンサワー"]
+      }
+    }
+    // 新しいお店を増やすときは、下のように追加する↓
+    // 店のID: {
+    //   config: { brandColor: "#...", brandColorDark: "#...", headerTitle: "...",
+    //     googleMapReviewUrl: "...", storeName: "...", areaKeyword: "...", showPoweredBy: true, poweredByUrl: "#" },
+    //   chipData: { menu: ["...", "..."] }
+    // },
+  };
+
+  // URLに ?store= が無いときに使うデフォルトの店
+  const DEFAULT_STORE_ID = "demo";
+
+  const FREE_TEXT_HINTS = [
+    "例）店員さんが料理の説明を丁寧にしてくれた、など",
+    "例）お店の人がおすすめを聞いてくれた、など",
+    "例）隣の席の人と話が弾んだ、など",
+    "例）子連れでも気を遣わず過ごせた、など",
+    "例）誕生日のサプライズをしてくれた、など",
+    "例）駐車場やアクセスが便利だった、など",
+    "例）大将が気さくで楽しかった、など"
+  ];
+
+  // ------------------------------------------------------------------
+  // ここから下はロジック（通常は編集不要）
+  // ------------------------------------------------------------------
+
+  const storeId = new URLSearchParams(location.search).get("store") || DEFAULT_STORE_ID;
+  const store = STORES[storeId];
+
+  if (!store) {
+    document.body.innerHTML =
+      '<p style="text-align:center;margin-top:60px;color:#888;font-size:14px;">' +
+      "店舗の設定が見つかりませんでした。URLをご確認ください。</p>";
+    throw new Error("store not found: " + storeId);
+  }
+
+  const CONFIG = store.config;
+  const CHIP_DATA = Object.assign({}, DEFAULT_CHIP_DATA, store.chipData || {});
+
+  document.documentElement.style.setProperty("--brand", CONFIG.brandColor);
+  document.documentElement.style.setProperty("--brand-dark", CONFIG.brandColorDark);
+  document.getElementById("headerTitle").textContent = CONFIG.headerTitle;
+  if (CONFIG.showPoweredBy) {
+    document.getElementById("poweredByFooter").classList.remove("hidden");
+    document.getElementById("poweredByLink").href = CONFIG.poweredByUrl;
+  }
+
+  const STEPS = [
+    { key: "reason", title: "① ご利用シーンは？", required: true },
+    { key: "menu", title: "② 食べた・飲んだメニューは？", required: true },
+    { key: "impression", title: "③ 料理・お店の感想は？", required: true },
+    { key: "recommend", title: "④ こんな方におすすめしたい", required: true },
+    { key: "free", title: "⑤ その日ならではのひとこと（任意）", required: false }
+  ];
+
+  const selected = { reason: new Set(), menu: new Set(), impression: new Set(), recommend: new Set() };
+  let currentStep = 0;
+  let freeTextValue = "";
+
+  function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function joinList(arr) {
+    if (arr.length === 0) return "";
+    if (arr.length === 1) return arr[0];
+    return arr.slice(0, -1).join("や") + "や" + arr[arr.length - 1] + "など";
+  }
+  // 「感想」は単語ではなく文（述語）なので、名詞リスト用のjoinListではなく
+  // 「〜し、〜し、〜」の形でつなぐ（例: 美味しかったし、親切だったし、〜）
+  function joinClauses(arr) {
+    if (arr.length === 0) return "";
+    if (arr.length === 1) return arr[0];
+    return arr.slice(0, -1).map(s => s + "し、").join("") + arr[arr.length - 1];
+  }
+
+  function renderProgress() {
+    const wrap = document.getElementById("progressWrap");
+    wrap.innerHTML = "";
+    STEPS.forEach((_, i) => {
+      const dot = document.createElement("div");
+      dot.className = "dot rounded-full " + (
+        i === currentStep ? "w-6 h-2 brand-bg" :
+        i < currentStep ? "w-2 h-2 brand-bg opacity-40" :
+        "w-2 h-2 bg-gray-200"
+      );
+      wrap.appendChild(dot);
+    });
+  }
+
+  function chipClass(active) {
+    const base = "px-3 py-2.5 rounded-full text-sm border transition active:scale-95 select-none cursor-pointer";
+    return active ? `${base} chip-active` : `${base} bg-gray-50 text-gray-700 border-gray-300`;
+  }
+
+  function renderStep() {
+    const step = STEPS[currentStep];
+    const content = document.getElementById("stepContent");
+    document.getElementById("validationMsg").classList.add("hidden");
+
+    if (step.key === "free") {
+      content.innerHTML = `
+        <h2 class="text-sm font-bold text-gray-700 mb-1">${step.title}</h2>
+        <p class="text-xs text-gray-400 mb-3">一言でOK！あなたの回のエピソードを入れると、より伝わる口コミになります</p>
+        <textarea id="freeTextInput" rows="4"
+          class="w-full text-sm border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2"
+          style="--tw-ring-color: var(--brand);"
+          placeholder="${pickRandom(FREE_TEXT_HINTS)}"></textarea>
+      `;
+      content.querySelector("#freeTextInput").value = freeTextValue;
+      content.querySelector("#freeTextInput").addEventListener("input", (e) => {
+        freeTextValue = e.target.value;
+      });
+    } else {
+      const chips = CHIP_DATA[step.key].map(label => {
+        const active = selected[step.key].has(label);
+        return `<button type="button" data-value="${label}" class="${chipClass(active)}">${label}</button>`;
+      }).join("");
+      content.innerHTML = `
+        <h2 class="text-sm font-bold text-gray-700 mb-3">${step.title}</h2>
+        <div class="flex flex-wrap gap-2">${chips}</div>
+      `;
+      content.querySelectorAll("button[data-value]").forEach(chip => {
+        chip.addEventListener("click", () => {
+          const label = chip.dataset.value;
+          const set = selected[step.key];
+          if (set.has(label)) {
+            set.delete(label);
+            chip.className = chipClass(false);
+          } else {
+            set.add(label);
+            chip.className = chipClass(true);
+          }
+        });
+      });
+    }
+
+    content.classList.remove("step-fade");
+    void content.offsetWidth;
+    content.classList.add("step-fade");
+
+    document.getElementById("backBtn").classList.toggle("hidden", currentStep === 0);
+    document.getElementById("nextBtn").textContent =
+      currentStep === STEPS.length - 1 ? "口コミ文章を作成する" : "次へ";
+
+    renderProgress();
+  }
+
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    const step = STEPS[currentStep];
+    if (step.required && selected[step.key].size === 0) {
+      document.getElementById("validationMsg").classList.remove("hidden");
+      return;
+    }
+    if (currentStep < STEPS.length - 1) {
+      currentStep++;
+      renderStep();
+    } else {
+      showResult();
+    }
+  });
+
+  document.getElementById("backBtn").addEventListener("click", () => {
+    if (currentStep > 0) {
+      currentStep--;
+      renderStep();
+    }
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    Object.values(selected).forEach(set => set.clear());
+    freeTextValue = "";
+    currentStep = 0;
+    document.getElementById("resultSection").classList.add("hidden");
+    document.getElementById("wizard").classList.remove("hidden");
+    renderStep();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  function buildReviewText() {
+    const reasons = Array.from(selected.reason);
+    const menus = Array.from(selected.menu);
+    const impressions = Array.from(selected.impression);
+    const recommends = Array.from(selected.recommend);
+    const freeText = freeTextValue.trim();
+    const { storeName, areaKeyword } = CONFIG;
+
+    const lines = [];
+
+    const timePrefixes = ["", "", "先日、", "この間、"];
+    const intro = pickRandom(timePrefixes);
+    const openings = reasons.length > 0
+      ? [
+          `${intro}${areaKeyword}にある${storeName}さんに、${joinList(reasons)}で伺いました。`,
+          `${intro}${joinList(reasons)}で${areaKeyword}の${storeName}さんを利用させてもらいました。`,
+          `${intro}${areaKeyword}の${storeName}さんに、${joinList(reasons)}で行ってきました。`,
+          `${intro}${joinList(reasons)}で${storeName}さん（${areaKeyword}）にお邪魔しました。`,
+          `${intro}${areaKeyword}で${joinList(reasons)}にちょうど良さそうな${storeName}さんへ。`
+        ]
+      : [
+          `${intro}${areaKeyword}にある${storeName}さんにお邪魔しました。`,
+          `${intro}${areaKeyword}の${storeName}さんを利用させてもらいました。`
+        ];
+    lines.push(pickRandom(openings));
+
+    const blocks = [];
+
+    if (menus.length > 0) {
+      blocks.push(pickRandom([
+        `${joinList(menus)}を頼んだんですが、正直かなり美味しくてびっくりしました。`,
+        `特に${joinList(menus)}が印象に残ってます。また食べたいです。`,
+        `${joinList(menus)}をいただきましたが、どれも期待以上でした。`,
+        `迷った末に${joinList(menus)}を注文。個人的にはかなり好みの味でした。`,
+        `${joinList(menus)}を食べたんですが、クオリティの高さに驚きました。`,
+        `頼んだのは${joinList(menus)}。どれも手が込んでいて満足でした。`
+      ]));
+    }
+
+    if (impressions.length > 0) {
+      blocks.push(pickRandom([
+        `${joinClauses(impressions)}ところも良くて、居心地の良い時間を過ごせました。`,
+        `${joinClauses(impressions)}のが印象的で、普通に満足度高かったです。`,
+        `${joinClauses(impressions)}のもポイント高いなと思いました。`,
+        `${joinClauses(impressions)}し、想像していたより全然良かったです。`,
+        `${joinClauses(impressions)}のが個人的に刺さりました。`,
+        `${joinClauses(impressions)}ところに好感が持てました。`
+      ]));
+    }
+
+    if (recommends.length > 0) {
+      blocks.push(pickRandom([
+        `${joinList(recommends)}には結構おすすめできると思います。`,
+        `個人的には${joinList(recommends)}にぜひ行ってほしいお店です。`,
+        `${joinList(recommends)}にはハマるんじゃないかなと思います。`,
+        `${joinList(recommends)}には特に刺さるお店だと思います。`,
+        `${joinList(recommends)}は一度行ってみる価値ありです。`
+      ]));
+    }
+
+    shuffle(blocks).forEach(line => lines.push(line));
+
+    if (freeText) lines.push(freeText);
+
+    lines.push(pickRandom([
+      `また近いうちに${storeName}さんに行こうと思います。`,
+      "また絶対リピートします。ごちそうさまでした！",
+      "近くに来たときはまた寄りたいお店です。",
+      "総合的にかなり満足だったので、また誰かを誘って行きたいです。",
+      "機会があればまた利用したいです。",
+      "また別のメニューも試しに行きたいと思います。"
+    ]));
+
+    return lines.join("\n");
+  }
+
+  function showResult() {
+    document.getElementById("wizard").classList.add("hidden");
+    document.getElementById("resultText").value = buildReviewText();
+    document.getElementById("resultSection").classList.remove("hidden");
+    document.getElementById("copyMsg").classList.add("hidden");
+    document.getElementById("googleMapBtn").href = CONFIG.googleMapReviewUrl;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.getElementById("copyBtn").addEventListener("click", async () => {
+    const text = document.getElementById("resultText").value;
+    const msg = document.getElementById("copyMsg");
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      const ta = document.getElementById("resultText");
+      ta.select();
+      document.execCommand("copy");
+    }
+    msg.classList.remove("hidden");
+    msg.classList.remove("copy-pop");
+    void msg.offsetWidth;
+    msg.classList.add("copy-pop");
+    setTimeout(() => msg.classList.add("hidden"), 2500);
+  });
+
+  renderStep();
+</script>
+</body>
+</html>
