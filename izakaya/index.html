@@ -94,6 +94,10 @@
   // そのまま使い回せるので、共通の名簿として1か所にまとめている。
   // 店ごとに変えたい場合だけ、下のSTORESの中にchipDataとして書けば上書きできる。
   // ==================================================================
+  // 【新しい選択肢を追加する人へ】種類ごとに書き方のルールが違うので注意：
+  // ・reason／recommend／menu（メニュー）は「単語（名詞）」で書く（例:「デート」「〇〇したい人」）
+  // ・impression（感想）だけは「文（言い切りの過去形）」で書く（例:「〜だった」「〜かった」で終わる形）
+  //   感想を名詞で書いてしまう（例:「親切」）と、複数選んだ時に日本語がおかしくなるので必ず過去形で。
   const DEFAULT_CHIP_DATA = {
     reason: [
       "友人との飲み会", "仕事帰りの一杯", "デート", "接待・会食",
@@ -183,6 +187,11 @@
   // ------------------------------------------------------------------
   // ここから下はロジック（通常は編集不要）
   // ------------------------------------------------------------------
+
+  // 1つのステップで選べるチップの数の上限。多く選ばせすぎると
+  // 口コミ文が「友人との飲み会や仕事帰りやデートや接待や…」のように
+  // 不自然に長い羅列になってしまうため、上限を設けている。
+  const MAX_SELECT = 3;
 
   const storeId = new URLSearchParams(location.search).get("store") || DEFAULT_STORE_ID;
   const store = STORES[storeId];
@@ -282,7 +291,8 @@
         return `<button type="button" data-value="${label}" class="${chipClass(active)}">${label}</button>`;
       }).join("");
       content.innerHTML = `
-        <h2 class="text-sm font-bold text-gray-700 mb-3">${step.title}</h2>
+        <h2 class="text-sm font-bold text-gray-700 mb-1">${step.title}</h2>
+        <p class="text-xs text-gray-400 mb-3">複数選べます（最大${MAX_SELECT}つまで）</p>
         <div class="flex flex-wrap gap-2">${chips}</div>
       `;
       content.querySelectorAll("button[data-value]").forEach(chip => {
@@ -293,6 +303,14 @@
             set.delete(label);
             chip.className = chipClass(false);
           } else {
+            // 選びすぎると口コミが不自然に長くなるので、選べる数に上限を設けている
+            if (set.size >= MAX_SELECT) {
+              const msg = document.getElementById("validationMsg");
+              msg.textContent = `選べるのは${MAX_SELECT}つまでです`;
+              msg.classList.remove("hidden");
+              return;
+            }
+            document.getElementById("validationMsg").classList.add("hidden");
             set.add(label);
             chip.className = chipClass(true);
           }
@@ -314,7 +332,9 @@
   document.getElementById("nextBtn").addEventListener("click", () => {
     const step = STEPS[currentStep];
     if (step.required && selected[step.key].size === 0) {
-      document.getElementById("validationMsg").classList.remove("hidden");
+      const msg = document.getElementById("validationMsg");
+      msg.textContent = "1つ以上タップして選んでください";
+      msg.classList.remove("hidden");
       return;
     }
     if (currentStep < STEPS.length - 1) {
