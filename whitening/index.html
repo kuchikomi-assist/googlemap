@@ -18,32 +18,90 @@
   .dot { transition: all .2s ease; }
   .copy-pop { animation: copyPop .3s ease; }
   @keyframes copyPop { 0% { transform: scale(.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+  /* ===== 歯科医院のWeb問診票のような、清潔感のある見た目 ===== */
+  :root { --brand-soft: #e9f6f8; --line: #dcebef; --ink: #23424a; --sub: #6b8389; }
+  body.dental-bg {
+    background: linear-gradient(180deg, #e6f4f7 0%, #f5fbfc 220px, #f7fbfc 100%);
+    font-family: "Hiragino Maru Gothic ProN", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+    color: var(--ink);
+  }
+  .dental-header { text-align: center; margin-bottom: 1.1rem; }
+  .dental-logo {
+    width: 56px; height: 56px; margin: 0 auto .5rem; border-radius: 9999px;
+    background: #fff; color: var(--brand); display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(26, 154, 168, .18); border: 1px solid var(--line);
+  }
+  .dental-store { font-size: .8rem; letter-spacing: .18em; color: var(--brand); font-weight: 700; margin-bottom: .15rem; }
+  .dental-title { font-size: 1.15rem; font-weight: 700; color: var(--ink); }
+  .dental-lead { font-size: .75rem; color: var(--sub); margin-top: .35rem; line-height: 1.6; }
+
+  .step-head { display: flex; justify-content: space-between; align-items: baseline; font-size: .72rem; color: var(--sub); margin-bottom: .35rem; letter-spacing: .06em; }
+  .step-head b { color: var(--brand); font-size: .95rem; }
+  .step-bar { height: 6px; border-radius: 9999px; background: #d9eaee; overflow: hidden; }
+  .step-bar span { display: block; height: 100%; border-radius: 9999px; background: var(--brand); transition: width .3s ease; }
+
+  .dental-card { background: #fff; border: 1px solid var(--line); box-shadow: 0 6px 20px rgba(35, 66, 74, .06); }
+  .q-title { display: flex; align-items: center; gap: .5rem; font-size: .95rem; font-weight: 700; color: var(--ink); margin-bottom: .3rem; }
+  .q-badge {
+    flex: none; min-width: 2rem; height: 1.6rem; padding: 0 .45rem; border-radius: .5rem;
+    background: var(--brand-soft); color: var(--brand); font-size: .8rem; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .q-note { font-size: .72rem; font-weight: 400; color: var(--sub); }
+  .q-hint { font-size: .72rem; color: var(--sub); margin-bottom: .8rem; padding-left: .1rem; }
+
+  .dental-chip {
+    padding: .65rem .85rem; border-radius: .75rem; font-size: .875rem; line-height: 1.4;
+    background: #f7fbfc; color: var(--ink); border: 1.5px solid var(--line); text-align: left;
+    display: inline-flex; align-items: center; gap: .4rem;
+  }
+  .dental-chip::before {
+    content: ""; flex: none; width: 1rem; height: 1rem; border-radius: .3rem;
+    border: 1.5px solid #b9d3d9; background: #fff;
+  }
+  .dental-chip.chip-active { background: var(--brand-soft); color: var(--brand-dark); border-color: var(--brand); font-weight: 700; }
+  .dental-chip.chip-active::before {
+    border-color: var(--brand);
+    background: var(--brand) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat;
+  }
+  .dental-input { border: 1.5px solid var(--line) !important; background: #fbfdfd; }
+  .btn-outline { background: #fff; color: var(--brand-dark); border: 1.5px solid var(--brand); }
+  .btn-outline:hover { background: var(--brand-soft); }
+  .btn-back { background: #fff; color: var(--sub); border: 1.5px solid var(--line); }
 </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="dental-bg min-h-screen">
 
   <div class="max-w-md mx-auto px-4 py-6 pb-16">
 
     <!-- ヘッダー -->
-    <header class="text-center mb-5">
-      <h1 class="text-lg font-bold text-gray-800" id="headerTitle">口コミ投稿のご協力をお願いします</h1>
-      <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">
+    <header class="dental-header">
+      <div class="dental-logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5.5C10.5 4.3 8.8 3.8 7.2 4.1 4.9 4.6 3.6 6.8 4.1 9.4c.3 1.6 1 2.9 1.4 4.4.5 1.8.6 3.6 1.1 5.3.3 1 .8 1.6 1.5 1.6.9 0 1.3-.9 1.5-2l.5-2.6c.2-1 .9-1.6 1.9-1.6s1.7.6 1.9 1.6l.5 2.6c.2 1.1.6 2 1.5 2 .7 0 1.2-.6 1.5-1.6.5-1.7.6-3.5 1.1-5.3.4-1.5 1.1-2.8 1.4-4.4.5-2.6-.8-4.8-3.1-5.3-1.6-.3-3.3.2-4.8 1.4z"/>
+          <path d="M17.6 2.2v2.6M16.3 3.5h2.6" stroke-width="1.3"/>
+        </svg>
+      </div>
+      <p class="dental-store" id="storeLabel"></p>
+      <h1 class="dental-title" id="headerTitle">口コミ投稿のご協力をお願いします</h1>
+      <p class="dental-lead">
         タップして選ぶだけで、口コミ文章の下書きができます
       </p>
     </header>
 
     <!-- 進捗バー -->
-    <div id="progressWrap" class="flex items-center justify-center gap-1.5 mb-5">
+    <div id="progressWrap" class="mb-4">
       <!-- JSでドット生成 -->
     </div>
 
     <!-- ウィザード本体 -->
-    <div id="wizard" class="bg-white rounded-2xl shadow-sm p-5 mb-4 min-h-[260px] flex flex-col">
+    <div id="wizard" class="dental-card rounded-2xl p-5 mb-4 min-h-[260px] flex flex-col">
       <div id="stepContent" class="flex-1"></div>
 
       <div class="flex gap-2 mt-5">
         <button id="backBtn"
-          class="hidden flex-1 border border-gray-300 text-gray-600 font-bold py-3 rounded-xl active:scale-[0.98] transition">
+          class="hidden flex-1 btn-back font-bold py-3 rounded-xl active:scale-[0.98] transition">
           戻る
         </button>
         <button id="nextBtn"
@@ -55,22 +113,22 @@
     </div>
 
     <!-- 結果表示 -->
-    <section id="resultSection" class="bg-white rounded-2xl shadow-sm p-4 mb-4 hidden step-fade">
-      <h2 class="text-sm font-bold text-gray-700 mb-3">作成された口コミ文章（自由に編集できます）</h2>
+    <section id="resultSection" class="dental-card rounded-2xl p-4 mb-4 hidden step-fade">
+      <h2 class="q-title mb-3">作成された口コミ文章<span class="q-note">自由に編集できます</span></h2>
       <p class="text-xs text-gray-500 mb-2">これはあくまで下書きです。ご自身の言葉に直してから投稿してください。</p>
       <textarea id="resultText" rows="8"
-        class="w-full text-sm border border-gray-300 rounded-xl p-3 leading-relaxed focus:outline-none focus:ring-2"
+        class="w-full text-sm dental-input rounded-xl p-3 leading-relaxed focus:outline-none focus:ring-2"
         style="--tw-ring-color: var(--brand);"></textarea>
 
       <div class="mt-3 space-y-2">
         <button id="copyBtn"
-          class="w-full bg-gray-800 hover:bg-gray-900 active:scale-[0.98] transition text-white font-bold py-3 rounded-xl shadow-sm">
+          class="w-full btn-outline active:scale-[0.98] transition font-bold py-3 rounded-xl">
           文章をコピー
         </button>
         <p id="copyMsg" class="text-center text-sm text-green-600 font-bold hidden copy-pop">✓ コピーしました！</p>
 
         <a id="googleMapBtn" href="#" target="_blank" rel="noopener noreferrer"
-          class="block text-center w-full bg-green-500 hover:bg-green-600 active:scale-[0.98] transition text-white font-bold py-3 rounded-xl shadow-sm">
+          class="block text-center w-full brand-bg active:scale-[0.98] transition text-white font-bold py-3 rounded-xl shadow-sm">
           Googleマップで口コミを書く
         </a>
 
@@ -122,8 +180,8 @@
   const STORES = {
     bian: {
       config: {
-        brandColor: "#b08d57",
-        brandColorDark: "#8f6f3f",
+        brandColor: "#1a9aa8",
+        brandColorDark: "#137783",
         headerTitle: "ご感想をお聞かせください",
         // Googleの口コミ投稿画面（place_idで直接開く）。
         // 本番では、オーナー用管理画面の「クチコミを増やす」で発行される専用リンクに差し替えてもよい
@@ -172,6 +230,7 @@
   document.documentElement.style.setProperty("--brand", CONFIG.brandColor);
   document.documentElement.style.setProperty("--brand-dark", CONFIG.brandColorDark);
   document.getElementById("headerTitle").textContent = CONFIG.headerTitle;
+  document.getElementById("storeLabel").textContent = CONFIG.storeName;
   if (CONFIG.showPoweredBy) {
     document.getElementById("poweredByFooter").classList.remove("hidden");
     document.getElementById("poweredByLink").href = CONFIG.poweredByUrl;
@@ -179,11 +238,11 @@
 
   // max: そのステップで選べる数。きっかけ・メニューは複数選ぶと矛盾しやすいので1つだけ
   const STEPS = [
-    { key: "reason", title: "① ご来店のきっかけは？", required: true, max: 1 },
-    { key: "menu", title: "② 受けたメニューは？", required: true, max: 1 },
-    { key: "impression", title: "③ 良かったところは？", required: true, max: 3 },
-    { key: "recommend", title: "④ こんな方におすすめしたい", required: true, max: 2 },
-    { key: "free", title: "⑤ ご自身の言葉でひとこと（任意）", required: false }
+    { key: "reason", title: "ご来店のきっかけは？", required: true, max: 1 },
+    { key: "menu", title: "受けたメニューは？", required: true, max: 1 },
+    { key: "impression", title: "良かったところは？", required: true, max: 3 },
+    { key: "recommend", title: "こんな方におすすめしたい", required: true, max: 2 },
+    { key: "free", title: "ご自身の言葉でひとこと（任意）", required: false }
   ];
 
   const selected = { reason: new Set(), menu: new Set(), impression: new Set(), recommend: new Set() };
@@ -224,21 +283,15 @@
 
   function renderProgress() {
     const wrap = document.getElementById("progressWrap");
-    wrap.innerHTML = "";
-    STEPS.forEach((_, i) => {
-      const dot = document.createElement("div");
-      dot.className = "dot rounded-full " + (
-        i === currentStep ? "w-6 h-2 brand-bg" :
-        i < currentStep ? "w-2 h-2 brand-bg opacity-40" :
-        "w-2 h-2 bg-gray-200"
-      );
-      wrap.appendChild(dot);
-    });
+    const pct = Math.round((currentStep + 1) / STEPS.length * 100);
+    wrap.innerHTML = `
+      <div class="step-head"><span>STEP <b>${currentStep + 1}</b> / ${STEPS.length}</span><span>かんたん入力</span></div>
+      <div class="step-bar"><span style="width:${pct}%"></span></div>`;
   }
 
   function chipClass(active) {
-    const base = "px-3 py-2.5 rounded-full text-sm border transition active:scale-95 select-none cursor-pointer";
-    return active ? `${base} chip-active` : `${base} bg-gray-50 text-gray-700 border-gray-300`;
+    const base = "dental-chip transition active:scale-95 select-none cursor-pointer";
+    return active ? `${base} chip-active` : base;
   }
 
   function renderStep() {
@@ -248,10 +301,10 @@
 
     if (step.key === "free") {
       content.innerHTML = `
-        <h2 class="text-sm font-bold text-gray-700 mb-1">${step.title}</h2>
-        <p class="text-xs text-gray-400 mb-3">白さの感想や、その日のエピソードなど、あなたの言葉で書き足すと伝わる口コミになります</p>
+        <h2 class="q-title"><span class="q-badge">Q${currentStep + 1}</span>${step.title}</h2>
+        <p class="q-hint">白さの感想や、その日のエピソードなど、あなたの言葉で書き足すと伝わる口コミになります</p>
         <textarea id="freeTextInput" rows="4"
-          class="w-full text-sm border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2"
+          class="w-full text-sm dental-input rounded-xl p-3 focus:outline-none focus:ring-2"
           style="--tw-ring-color: var(--brand);"
           placeholder="${pickRandom(FREE_TEXT_HINTS)}"></textarea>
       `;
@@ -264,8 +317,8 @@
       }).join("");
       const hint = step.max === 1 ? "1つ選んでください" : `複数選べます（最大${step.max}つまで）`;
       content.innerHTML = `
-        <h2 class="text-sm font-bold text-gray-700 mb-1">${step.title}</h2>
-        <p class="text-xs text-gray-400 mb-3">${hint}</p>
+        <h2 class="q-title"><span class="q-badge">Q${currentStep + 1}</span>${step.title}</h2>
+        <p class="q-hint">${hint}</p>
         <div class="flex flex-wrap gap-2">${chips}</div>
       `;
       content.querySelectorAll("button[data-value]").forEach(chip => {
@@ -409,6 +462,9 @@
     document.getElementById("wizard").classList.add("hidden");
     document.getElementById("resultText").value = buildReviewText();
     document.getElementById("resultSection").classList.remove("hidden");
+    document.getElementById("progressWrap").innerHTML = `
+      <div class="step-head"><span><b>下書きができました</b></span><span>あと少しです</span></div>
+      <div class="step-bar"><span style="width:100%"></span></div>`;
     document.getElementById("copyMsg").classList.add("hidden");
     document.getElementById("googleMapBtn").href = CONFIG.googleMapReviewUrl;
     window.scrollTo({ top: 0, behavior: "smooth" });
