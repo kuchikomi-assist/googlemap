@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a1a62">
+<title>サケストーリー｜ご感想のお願い</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ==================================================================
+     見た目：ロゴの紺 × 和紙の生成り。ロゴの「菱形」と「波」をモチーフに使う
+     フォントが読み込めなくても、端末の明朝・ゴシックで崩れずに表示される
+     ================================================================== */
+  :root {
+    --navy: #0a1a62;
+    --navy-deep: #06114a;
+    --navy-soft: #e7e9f3;
+    --paper: #f6f2e8;
+    --paper-card: #fffdf8;
+    --line: #dcd6c6;
+    --ink: #1d2340;
+    --sub: #6c6a62;
+    --gold: #b08d4c;
+    --mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+    --gothic: "Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; min-height: 100vh; color: var(--ink); font-family: var(--gothic);
+    background-color: var(--paper);
+    /* 和紙のような、ごく薄いざらつき */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .38 0 0 0 0 .25 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  button, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 0; background: none; padding: 0; }
+  [hidden] { display: none !important; }
+
+  /* ---------- ヘッダー（紺の暖簾） ---------- */
+  .noren {
+    position: relative; background: var(--navy); color: #fff; text-align: center;
+    padding: 30px 16px 56px; overflow: hidden;
+  }
+  /* ロゴ下部の波（青海波）を、暖簾の裾に薄く敷く */
+  .noren::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 64px; opacity: .16;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='24' viewBox='0 0 48 24'%3E%3Cg fill='none' stroke='white' stroke-width='1.4'%3E%3Cpath d='M0 24a24 24 0 0 1 48 0M8 24a16 16 0 0 1 32 0M16 24a8 8 0 0 1 16 0'/%3E%3Cpath d='M-24 12a24 24 0 0 1 48 0M-16 12a16 16 0 0 1 32 0M-8 12a8 8 0 0 1 16 0M24 12a24 24 0 0 1 48 0M32 12a16 16 0 0 1 32 0M40 12a8 8 0 0 1 16 0'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 48px 24px;
+    -webkit-mask-image: linear-gradient(to top, #000 30%, transparent);
+            mask-image: linear-gradient(to top, #000 30%, transparent);
+  }
+  .noren-logo { width: 168px; height: auto; display: block; margin: 0 auto; }
+  .noren-address { margin: 12px 0 0; font-size: 11px; letter-spacing: .2em; opacity: .75; }
+
+  .wrap { max-width: 440px; margin: 0 auto; padding: 0 16px 48px; }
+
+  /* ---------- あいさつ ---------- */
+  .greeting {
+    position: relative; margin: -34px 0 18px; padding: 22px 20px 18px; text-align: center;
+    background: var(--paper-card); border: 1px solid var(--line); border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(10, 26, 98, .10);
+  }
+  .greeting h1 {
+    margin: 0; font-family: var(--mincho); font-weight: 800; font-size: 19px; letter-spacing: .08em;
+    color: var(--navy);
+  }
+  .greeting p { margin: 8px 0 0; font-size: 12.5px; line-height: 1.8; color: var(--sub); }
+  .rule { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px auto 0; width: 70%; }
+  .rule::before, .rule::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .rule i { width: 7px; height: 7px; transform: rotate(45deg); border: 1px solid var(--gold); }
+
+  /* ---------- 進み具合（ロゴの菱形を5つ並べる） ---------- */
+  .progress { display: flex; align-items: center; justify-content: space-between; margin: 0 4px 10px; }
+  .progress-label { font-size: 11.5px; color: var(--sub); letter-spacing: .12em; }
+  .progress-label b { font-family: var(--mincho); font-size: 16px; color: var(--navy); margin-right: 2px; }
+  .diamonds { display: flex; gap: 9px; }
+  .diamonds i {
+    width: 10px; height: 10px; transform: rotate(45deg); border: 1.5px solid var(--navy);
+    opacity: .3; transition: all .25s ease;
+  }
+  .diamonds i.done { background: var(--navy); opacity: 1; }
+  .diamonds i.now { opacity: 1; background: var(--paper-card); box-shadow: 0 0 0 3px rgba(10, 26, 98, .12); }
+
+  /* ---------- 質問カード ---------- */
+  .card {
+    background: var(--paper-card); border: 1px solid var(--line); border-radius: 4px;
+    padding: 22px 18px 18px; box-shadow: 0 6px 22px rgba(29, 35, 64, .06);
+  }
+  .q-num {
+    display: inline-block; font-family: var(--mincho); font-weight: 800; font-size: 12px; letter-spacing: .2em;
+    color: var(--gold); margin-bottom: 4px;
+  }
+  .q-title { margin: 0; font-family: var(--mincho); font-weight: 800; font-size: 18px; line-height: 1.5; color: var(--navy); }
+  .q-hint { margin: 6px 0 16px; font-size: 12px; color: var(--sub); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px; padding: 11px 14px; min-height: 46px;
+    border: 1.5px solid #cfd2e0; border-radius: 4px; background: #fff; color: var(--ink);
+    font-size: 14.5px; line-height: 1.4; text-align: left; user-select: none;
+    transition: background .15s ease, border-color .15s ease, color .15s ease, transform .1s ease;
+  }
+  .chip::before {
+    content: ""; flex: none; width: 14px; height: 14px; transform: rotate(45deg) scale(.8);
+    border: 1.5px solid #aeb3cb; background: #fff; transition: all .15s ease;
+  }
+  .chip:active { transform: scale(.97); }
+  .chip.on { background: var(--navy); border-color: var(--navy); color: #fff; font-weight: 700; }
+  .chip.on::before { border-color: #fff; background: #fff; box-shadow: inset 0 0 0 3px var(--navy); }
+
+  .free {
+    width: 100%; min-height: 120px; padding: 12px 14px; border: 1.5px solid #cfd2e0; border-radius: 4px;
+    background: #fff; font-size: 15px; line-height: 1.8; resize: vertical;
+  }
+  .free:focus, .result:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(10, 26, 98, .12); }
+
+  .actions { display: flex; gap: 10px; margin-top: 22px; }
+  .btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px;
+    padding: 12px 16px; border-radius: 4px; font-size: 15.5px; font-weight: 700; letter-spacing: .08em;
+    text-decoration: none; transition: transform .1s ease, background .15s ease;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { background: var(--navy); color: #fff; box-shadow: 0 4px 14px rgba(10, 26, 98, .25); }
+  .btn-primary:hover { background: var(--navy-deep); }
+  .btn-back { flex: 0 0 34%; background: transparent; color: var(--sub); border: 1.5px solid var(--line); }
+  .btn-outline { background: #fff; color: var(--navy); border: 1.5px solid var(--navy); }
+  .btn[aria-disabled="true"] { background: #c9cbd6; color: #fff; box-shadow: none; pointer-events: none; }
+  .msg { margin: 10px 0 0; text-align: center; font-size: 12.5px; color: #b3372f; }
+
+  /* ---------- 下書き ---------- */
+  .result-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .result-head span { font-size: 11.5px; color: var(--sub); }
+  .notice {
+    margin: 12px 0; padding: 10px 12px; border-left: 3px solid var(--gold); background: #faf5ea;
+    font-size: 12.5px; line-height: 1.7; color: #5b4a2a;
+  }
+  .result {
+    width: 100%; min-height: 220px; padding: 14px; border: 1.5px solid #cfd2e0; border-radius: 4px;
+    background: #fff; font-size: 15px; line-height: 1.9; resize: vertical;
+  }
+  .stack { display: grid; gap: 10px; margin-top: 14px; }
+  .how { margin: 16px 0 0; padding: 0; list-style: none; counter-reset: how; font-size: 12.5px; color: var(--sub); }
+  .how li { counter-increment: how; display: flex; gap: 8px; line-height: 1.7; }
+  .how li::before { content: counter(how); flex: none; font-family: var(--mincho); font-weight: 800; color: var(--gold); }
+  .copied { margin: 0; text-align: center; font-size: 13px; font-weight: 700; color: #2f7a4b; }
+  .reset { display: block; margin: 14px auto 0; font-size: 12px; color: var(--sub); text-decoration: underline; text-underline-offset: 3px; }
+  .map-note { margin: 0; text-align: center; font-size: 11.5px; color: var(--sub); }
+
+  .fade { animation: fade .28s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .pop { animation: pop .3s ease; }
+  @keyframes pop { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: none; } }
+
+  footer { margin-top: 28px; text-align: center; font-size: 10.5px; color: #b4b0a4; }
+  footer a { color: inherit; text-decoration: none; }
+</style>
+</head>
+<body>
+
+  <header class="noren">
+    <img class="noren-logo" src="logo-white.png" alt="日本酒と炙り料理 サケストーリー SAKE STORY" width="600" height="523">
+    <p class="noren-address" id="addressLine"></p>
+  </header>
+
+  <main class="wrap">
+    <section class="greeting">
+      <h1 id="headerTitle">ご来店ありがとうございました</h1>
+      <p>いくつかの質問にタップで答えると、<br>Googleの口コミに使える感想の下書きができます。</p>
+      <div class="rule"><i></i></div>
+    </section>
+
+    <div class="progress" id="progress"></div>
+
+    <section class="card" id="wizard">
+      <div id="stepContent"></div>
+      <p class="msg" id="validationMsg" hidden></p>
+      <div class="actions">
+        <button type="button" class="btn btn-back" id="backBtn" hidden>戻る</button>
+        <button type="button" class="btn btn-primary" id="nextBtn">次へ</button>
+      </div>
+    </section>
+
+    <section class="card fade" id="resultSection" hidden>
+      <div class="result-head">
+        <h2 class="q-title">感想の下書き</h2>
+        <span>自由に書き換えられます</span>
+      </div>
+      <p class="notice">これはあくまで下書きです。ご自身の言葉に直してから投稿してください。星の数もGoogleの画面でご自身で選んでください。</p>
+      <textarea class="result" id="resultText" aria-label="感想の下書き"></textarea>
+
+      <div class="stack">
+        <button type="button" class="btn btn-outline" id="copyBtn">文章をコピー</button>
+        <p class="copied pop" id="copyMsg" hidden>コピーしました</p>
+        <a class="btn btn-primary" id="googleMapBtn" href="#" target="_blank" rel="noopener noreferrer">Googleマップで口コミを書く</a>
+        <p class="map-note" id="mapNote" hidden></p>
+      </div>
+
+      <ol class="how">
+        <li>「文章をコピー」を押す</li>
+        <li>Googleマップの画面で星を選ぶ</li>
+        <li>入力欄に貼り付けて、ご自身の言葉に直してから投稿</li>
+      </ol>
+      <button type="button" class="reset" id="resetBtn">はじめからやり直す</button>
+    </section>
+
+    <footer id="poweredByFooter" hidden>
+      <a href="#" id="poweredByLink" target="_blank" rel="noopener noreferrer">Powered by クチコミアシスト</a>
+    </footer>
+  </main>
+
+<script>
+  // ==================================================================
+  // ★★★ サケストーリー（堺東・日本酒と炙り料理の居酒屋）版 ★★★
+  // 【選択肢を追加・変更する人へ】種類ごとに書き方のルールが違うので注意：
+  // ・reason（きっかけ）は「〜で伺いました」「〜に利用しました」の両方に続く名詞で書く
+  // ・menu（メニュー）は「〜をいただきました」に続く名詞で書く
+  // ・impression（良かったところ）は「〜だった／〜できた」で終わる過去形の文で書く
+  // ・recommend（おすすめしたい人）は「〜人」で終わる形で書く
+  // ・「日本一」「最安」など、お店が言い切れないことは入れない
+  // ・「気になった点」の選択肢は入れない（どの答えでも同じ流れにするため）
+  // ==================================================================
+  const CONFIG = {
+    storeName: "サケストーリー",
+    areaKeyword: "堺東",
+    addressLine: "SAKAI-HIGASHI ・ 堺東",
+    headerTitle: "ご来店ありがとうございました",
+    // Googleの口コミ投稿画面のURL。
+    // ★Googleビジネスプロフィールの登録・オーナー確認が済んだら、
+    //   管理画面の「クチコミを増やす」で出るリンク（または writereview?placeid=...）をここに入れる。
+    //   空のあいだは、ボタンを押せないようにして「準備中」と表示する。
+    googleMapReviewUrl: "",
+    // 開店してしばらく（目安：3か月）だけ「オープンしたばかり」の一文を使う。過ぎたら false にする
+    justOpened: true,
+    showPoweredBy: true,
+    poweredByUrl: "#"
+  };
+
+  const CHIP_DATA = {
+    reason: [
+      "仕事帰りの一杯", "友人との飲み会", "一人飲み", "デート",
+      "家族との食事", "誕生日・記念日のお祝い"
+    ],
+    // ★仮のメニュー。実際のお品書きがわかったら差し替える（オーナーに確認）
+    menu: ["日本酒", "炙り料理", "おつまみ", "ビール", "サワー・ハイボール"],
+    impression: [
+      "日本酒の種類が豊富だった", "料理に合う日本酒を教えてもらえた", "炙り料理が香ばしかった",
+      "日本酒に詳しくなくても楽しめた", "料理が美味しかった", "店員さんが気さくだった",
+      "店内の雰囲気が落ち着いていた", "一人でも入りやすかった"
+    ],
+    recommend: [
+      "日本酒が好きな人", "日本酒をこれから楽しみたい人", "仕事帰りに一杯飲みたい人",
+      "一人でゆっくり飲みたい人", "美味しいつまみでお酒を楽しみたい人", "新しいお店を開拓したい人"
+    ]
+  };
+
+  // 前の答えと矛盾する選択肢は出さない（例：炙り料理を頼んでいないのに「炙り料理が香ばしかった」）
+  const IMPRESSION_NEEDS = {
+    "炙り料理が香ばしかった": { menu: ["炙り料理"] },
+    "料理に合う日本酒を教えてもらえた": { menu: ["日本酒"] },
+    "日本酒に詳しくなくても楽しめた": { menu: ["日本酒"] },
+    "一人でも入りやすかった": { reason: ["一人飲み", "仕事帰りの一杯"] }
+  };
+  const RECOMMEND_NEEDS = {
+    "日本酒をこれから楽しみたい人": { menu: ["日本酒"] },
+    "一人でゆっくり飲みたい人": { reason: ["一人飲み", "仕事帰りの一杯"] }
+  };
+
+  const FREE_TEXT_HINTS = [
+    "例）おすすめしてもらったお酒の名前、など",
+    "例）一番おいしかった料理、など",
+    "例）お店の方との会話が楽しかった、など",
+    "例）また頼みたいメニュー、など",
+    "例）お店の雰囲気で印象に残ったこと、など"
+  ];
+
+  // ------------------------------------------------------------------
+  // ここから下はロジック（通常は編集不要）
+  // ------------------------------------------------------------------
+  const STEPS = [
+    { key: "reason", title: "今日はどんなご利用でしたか？", max: 1, required: true },
+    { key: "menu", title: "頼んだものは？", max: 2, required: true },
+    { key: "impression", title: "良かったところは？", max: 3, required: true },
+    { key: "recommend", title: "どんな方におすすめしたいですか？", max: 2, required: true },
+    { key: "free", title: "ご自身の言葉でひとこと", required: false }
+  ];
+  const KANJI = ["一", "二", "三", "四", "五"];
+
+  const selected = { reason: new Set(), menu: new Set(), impression: new Set(), recommend: new Set() };
+  let currentStep = 0;
+  let freeTextValue = "";
+
+  document.getElementById("headerTitle").textContent = CONFIG.headerTitle;
+  document.getElementById("addressLine").textContent = CONFIG.addressLine;
+  if (CONFIG.showPoweredBy) {
+    document.getElementById("poweredByFooter").hidden = false;
+    document.getElementById("poweredByLink").href = CONFIG.poweredByUrl;
+  }
+
+  function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function joinWith(arr, sep) {
+    if (arr.length <= 1) return arr[0] || "";
+    return arr.slice(0, -1).join(sep) + sep + arr[arr.length - 1];
+  }
+  // 感想（過去形の文）は「〜し、〜し、〜」でつなぐ
+  function joinClauses(arr) {
+    if (arr.length <= 1) return arr[0] || "";
+    return arr.slice(0, -1).map(s => s + "し、").join("") + arr[arr.length - 1];
+  }
+
+  function meets(need) {
+    if (!need) return true;
+    return Object.entries(need).every(([key, list]) => list.some(v => selected[key].has(v)));
+  }
+  function visibleChips(key) {
+    const needs = key === "impression" ? IMPRESSION_NEEDS : key === "recommend" ? RECOMMEND_NEEDS : null;
+    if (!needs) return CHIP_DATA[key];
+    const list = CHIP_DATA[key].filter(v => meets(needs[v]));
+    // 前に戻って答えを変えたとき、矛盾するようになった選択は外す
+    selected[key].forEach(v => { if (!list.includes(v)) selected[key].delete(v); });
+    return list;
+  }
+
+  function renderProgress(done) {
+    const n = STEPS.length;
+    const marks = STEPS.map((_, i) => {
+      const cls = done || i < currentStep ? "done" : i === currentStep ? "now" : "";
+      return `<i class="${cls}"></i>`;
+    }).join("");
+    const label = done
+      ? `<span class="progress-label"><b>下書き</b>ができました</span>`
+      : `<span class="progress-label">質問 <b>${currentStep + 1}</b> / ${n}</span>`;
+    document.getElementById("progress").innerHTML = `${label}<span class="diamonds" aria-hidden="true">${marks}</span>`;
+  }
+
+  function showMsg(text) {
+    const msg = document.getElementById("validationMsg");
+    msg.textContent = text;
+    msg.hidden = !text;
+  }
+
+  function renderStep() {
+    const step = STEPS[currentStep];
+    const content = document.getElementById("stepContent");
+    showMsg("");
+    const head = `<span class="q-num">其の${KANJI[currentStep]}</span><h2 class="q-title">${step.title}</h2>`;
+
+    if (step.key === "free") {
+      content.innerHTML = `${head}
+        <p class="q-hint">なくても大丈夫です。その日のことをひとこと足すと、あなたらしい口コミになります</p>
+        <textarea class="free" id="freeTextInput" placeholder="${pickRandom(FREE_TEXT_HINTS)}"></textarea>`;
+      const input = content.querySelector("#freeTextInput");
+      input.value = freeTextValue;
+      input.addEventListener("input", e => { freeTextValue = e.target.value; });
+    } else {
+      const chips = visibleChips(step.key).map(label =>
+        `<button type="button" class="chip${selected[step.key].has(label) ? " on" : ""}" data-value="${label}" aria-pressed="${selected[step.key].has(label)}">${label}</button>`
+      ).join("");
+      const hint = step.max === 1 ? "ひとつ選んでください" : `${step.max}つまで選べます`;
+      content.innerHTML = `${head}<p class="q-hint">${hint}</p><div class="chips">${chips}</div>`;
+      content.querySelectorAll(".chip").forEach(chip => chip.addEventListener("click", () => toggleChip(step, chip)));
+    }
+
+    content.classList.remove("fade");
+    void content.offsetWidth;
+    content.classList.add("fade");
+    document.getElementById("backBtn").hidden = currentStep === 0;
+    document.getElementById("nextBtn").textContent = currentStep === STEPS.length - 1 ? "下書きを作る" : "次へ";
+    renderProgress(false);
+  }
+
+  function setChip(chip, on) {
+    chip.classList.toggle("on", on);
+    chip.setAttribute("aria-pressed", on);
+  }
+  function toggleChip(step, chip) {
+    const set = selected[step.key];
+    const label = chip.dataset.value;
+    if (set.has(label)) { set.delete(label); setChip(chip, false); showMsg(""); return; }
+    if (step.max === 1) {
+      set.clear();
+      document.querySelectorAll("#stepContent .chip").forEach(c => setChip(c, false));
+    } else if (set.size >= step.max) {
+      showMsg(`選べるのは${step.max}つまでです`);
+      return;
+    }
+    showMsg("");
+    set.add(label);
+    setChip(chip, true);
+  }
+
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    const step = STEPS[currentStep];
+    if (step.required && selected[step.key].size === 0) {
+      showMsg(step.max === 1 ? "ひとつタップして選んでください" : "ひとつ以上タップして選んでください");
+      return;
+    }
+    if (currentStep < STEPS.length - 1) { currentStep++; renderStep(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    else showResult();
+  });
+  document.getElementById("backBtn").addEventListener("click", () => {
+    if (currentStep > 0) { currentStep--; renderStep(); }
+  });
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    Object.values(selected).forEach(s => s.clear());
+    freeTextValue = "";
+    currentStep = 0;
+    document.getElementById("resultSection").hidden = true;
+    document.getElementById("wizard").hidden = false;
+    renderStep();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  // ------------------------------------------------------------------
+  // 下書きの組み立て
+  // ・店名とエリア名は、書き出しで1回ずつだけ（何度も入れるとキーワードの詰め込みに見える）
+  // ・言い回しと文の順番をランダムにして、同じ選択でも毎回ちがう文章になるようにする
+  // ------------------------------------------------------------------
+  function buildReviewText() {
+    const reason = [...selected.reason][0];
+    const menus = shuffle([...selected.menu]);
+    const impressions = shuffle([...selected.impression]);
+    const recommends = shuffle([...selected.recommend]);
+    const freeText = freeTextValue.trim();
+    const { storeName: s, areaKeyword: a } = CONFIG;
+    const when = pickRandom(["", "", "", "先日、", "この前、", "今週、"]);
+
+    const lines = [pickRandom([
+      `${when}${reason}で、${a}の${s}さんに伺いました。`,
+      `${when}${a}にある${s}さんに、${reason}で行ってきました。`,
+      `${when}${reason}で${s}さん（${a}）に行きました。`,
+      `${when}${reason}に、${a}の${s}さんを利用しました。`,
+      `${when}${a}の${s}さんへ、${reason}で伺いました。`
+    ])];
+
+    const menu = joinWith(menus, "と");
+    const blocks = [pickRandom([
+      `${menu}をいただきました。`,
+      `今回は${menu}を頼みました。`,
+      `注文したのは${menu}です。`,
+      `${menu}を中心にいただきました。`
+    ])];
+    blocks.push(pickRandom([
+      `${joinClauses(impressions)}のが良かったです。`,
+      `${joinClauses(impressions)}のが印象に残っています。`,
+      `${joinClauses(impressions)}ので、満足しています。`,
+      `個人的には、${joinClauses(impressions)}のが嬉しかったです。`,
+      `${joinClauses(impressions)}ところが良かったです。`
+    ]));
+    blocks.push(pickRandom([
+      `${joinWith(recommends, "や")}には、おすすめしたいお店です。`,
+      `${joinWith(recommends, "や")}にはぴったりだと思います。`,
+      `${joinWith(recommends, "や")}には、一度行ってみてほしいです。`,
+      `${joinWith(recommends, "や")}に合うお店だと思います。`
+    ]));
+
+    // 書き出しの次は「頼んだもの」。感想とおすすめだけ順番を入れ替える
+    lines.push(blocks[0]);
+    shuffle(blocks.slice(1)).forEach(b => lines.push(b));
+    if (freeText) lines.push(freeText);
+
+    const closings = ["また伺います。", "ごちそうさまでした。", "また行きます。ごちそうさまでした。", "次は違うお酒も飲んでみたいです。"];
+    if (CONFIG.justOpened) closings.push("オープンしたばかりのお店なので、これからも楽しみです。");
+    lines.push(pickRandom(closings));
+    return lines.join("\n");
+  }
+
+  function fitHeight(ta) {
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + 4 + "px";
+  }
+  document.getElementById("resultText").addEventListener("input", e => fitHeight(e.target));
+
+  function showResult() {
+    document.getElementById("wizard").hidden = true;
+    const ta = document.getElementById("resultText");
+    ta.value = buildReviewText();
+    document.getElementById("resultSection").hidden = false;
+    fitHeight(ta); // 表示してからでないと高さが測れない
+    document.getElementById("copyMsg").hidden = true;
+    const btn = document.getElementById("googleMapBtn");
+    const note = document.getElementById("mapNote");
+    if (CONFIG.googleMapReviewUrl) {
+      btn.href = CONFIG.googleMapReviewUrl;
+      btn.removeAttribute("aria-disabled");
+      btn.textContent = "Googleマップで口コミを書く";
+      note.hidden = true;
+    } else {
+      btn.removeAttribute("href");
+      btn.setAttribute("aria-disabled", "true");
+      btn.textContent = "Googleマップは準備中です";
+      note.textContent = "お店のGoogleマップのページができしだい、ここから投稿できるようになります";
+      note.hidden = false;
+    }
+    renderProgress(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.getElementById("copyBtn").addEventListener("click", async () => {
+    const ta = document.getElementById("resultText");
+    try { await navigator.clipboard.writeText(ta.value); }
+    catch (e) { ta.select(); document.execCommand("copy"); }
+    const msg = document.getElementById("copyMsg");
+    msg.hidden = false;
+    msg.classList.remove("pop"); void msg.offsetWidth; msg.classList.add("pop");
+    setTimeout(() => { msg.hidden = true; }, 2500);
+  });
+
+  renderStep();
+</script>
+</body>
+</html>
