@@ -64,7 +64,7 @@
     box-shadow: 0 10px 30px rgba(10, 26, 98, .10);
   }
   .greeting h1 {
-    margin: 0; font-family: var(--mincho); font-weight: 800; font-size: 19px; letter-spacing: .08em;
+    margin: 0; font-family: var(--mincho); font-weight: 800; font-size: 19px; letter-spacing: .08em; line-height: 1.6; white-space: pre-line;
     color: var(--navy);
   }
   .greeting p { margin: 8px 0 0; font-size: 12.5px; line-height: 1.8; color: var(--sub); }
@@ -168,7 +168,8 @@
 
   <main class="wrap">
     <section class="greeting">
-      <h1 id="headerTitle">ありがとうございます</h1>
+      <h1 id="headerTitle">本日のお料理とお酒、
+いかがでしたか。</h1>
       <p>いくつかの質問にタップで答えると、<br>Googleの口コミに使える感想の下書きができます。</p>
       <div class="rule"><i></i></div>
     </section>
@@ -227,7 +228,8 @@
     storeName: "サケストーリー",
     areaKeyword: "堺東",
     addressLine: "SAKAI-HIGASHI ・ 堺東",
-    headerTitle: "ありがとうございます",
+    // 見出し。\n の位置で改行する
+    headerTitle: "本日のお料理とお酒、\nいかがでしたか。",
     // Googleの口コミ投稿画面のURL。
     // ★Googleビジネスプロフィールの登録・オーナー確認が済んだら、
     //   管理画面の「クチコミを増やす」で出るリンク（または writereview?placeid=...）をここに入れる。
